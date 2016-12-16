@@ -34,7 +34,7 @@ output:
 * Project title: Caste-Based Mate Selection in Modern India
 * RPubs link: <http://rpubs.com/tsingh/final_project>
 
-**Abstract**: I examine how the prevalence of the caste system in India varies with socio-economic status. Specifically, I answer the question: “When seeking a marriage partner, is the importance given to the partner’s caste related to a person’s income or education?”
+**Abstract**: I examine how the prevalence of the caste system in India varies with socio-economic status. Specifically, I answer the question: “When seeking a marriage partner, is the importance given to the partner’s caste related to a person’s income, education or occupation?”
 
 I find strong statistically significant relationships between socioeconomic status and attitude towards the caste system. Every $1000 increase in annual income is correlated with a 0.3 percent decrease in probability of having a preference for partner's caste. Additionally, I find that a person with a Master’s degree is 7.5 percentage points less likely and a person with a Professional degree is  15 percentage points less likely to have caste preferences than someone with a Bachelor’s degree. A person working in the public sector is 9 percentage points more likely to give importance to parnter's caste than a person working in the private sector.
 
@@ -47,9 +47,9 @@ The caste system is a hierachical social structure that originated from Hindu sc
 
 The class structure formed by the caste system has led to oppression of people belonging to lower rungs of the hierarchy (Center for Human Rights and Global Justice 2007). This oppression forms the basis of caste-based discrimination such wage and employment discrimination in modern India (Banerjee and Knight 1985). The rigidity of the caste system is further propagated through traditional rules such as living with members of the same caste, marrying within caste and so on.
 
-Within-caste marriages are still strongly encouraged in the traditional marriage system (Banerjee et al. 2013). In the modern arranged marriage system, individuals place advertisements in local newspapers or create profiles on on-line matrimonial websites to search for marriage partners. Partner's caste is one of the major criteria for marriage and a person's caste preferences for their partner reveals their attitude towards the caste system.
+Within-caste marriages are still strongly encouraged in the traditional marriage system (Banerjee et al. 2013). In the modern arranged marriage system, individuals place advertisements in local newspapers or create profiles on online matrimonial websites to search for marriage partners. Partner's caste is one of the major criteria for marriage and a person's caste preferences for their partner reveals their attitude towards the caste system.
 
-I explore how the rigidity of caste preference for marriage depends on a person’s income, education or occupation. Using a unique dataset of young middle class Indian men who placed matrimonial advertisements online, I predict a person's caste preferences based on their socio-economic status.
+I explore how the rigidity of caste preferences for marriage depends on a person’s income, education or occupation. Using a unique dataset of young middle class Indian men who placed matrimonial advertisements online, I predict a person's caste preferences based on their socio-economic status.
 
 ## Sample Summary
 
@@ -226,7 +226,7 @@ grid.arrange(sample_income, sample_age, ncol=2)
 
 ## Analysis
 
-I conduct regression analysis to estimate the relationship between income, education and occupation and a person's caste preferences. I use a linear probability model, in which the outcome variable is the probability of having a caste preference for marriage and the independent variables are in each case, annual income, highest education degree and type of job.
+I conduct regression analysis to estimate the relationship between income, education and occupation and a person's caste preferences. I use a linear probability model, in which the outcome variable is the probability of having caste preferences for marriage (I define a person having caste preferences as someone who mentions partner's preferred caste in the advertisement on the matrimonial website). The independent variables are in each case, annual income, highest education degree and type of job.
 
 Linear probability models do have a higher possibility for bias and inconsistency than logistic or probabilistic models, but the estimates obtained from the model are easier to interpret (Friedman 2012). The ability to intuitively interpret the estimates from the model is especially important in this case, since I am studying a problem with social implications.
 
@@ -241,7 +241,7 @@ I estimate the following linear probability model in Table 1 in the Appendix:
 
 $$Probability(CastePreferences) = \alpha + \beta .Income + \epsilon$$ 
 
-I find that **a $1000 increase in a person's income reduces the probability of having caste preferences by 0.3 percentage points**. Although this result is statistically significant, it is not a large effect.
+I find that **a $1000 increase in a person's annual income reduces the probability of having caste preferences by 0.3 percentage points**. Although this result is statistically significant, it is not a large effect.
 <br><br>
 ```{r, echo=FALSE, warning=FALSE, fig.width=12, fig.height=8}
 
@@ -266,7 +266,7 @@ preferences %>%
 
 ### Education
 
-I group the education variable into four main categories: Bachelor's, Masters, Professional (Engineering or Medical) and Doctorate. The exploratory analysis in Figure 3 shows that people having Bachelor's or Doctorate degrees have a higher than baseline probability of having caste preferences and people having Master's or Professional degrees have lower than baseline probabilities. 
+I group the education variable into four main categories: Bachelor's, Masters, Professional (Engineering or Medical) and Doctorate. The exploratory analysis in Figure 3 shows that a higher than baseline proportion of people having Bachelor's or Doctorate degrees have caste preferences and people having Master's or Professional degrees have lower than baseline preferences. 
 <br><br>
 ```{r, echo=FALSE, warning=FALSE, fig.width=10, fig.height=8}
 
@@ -299,7 +299,7 @@ $$Probability(CastePreferences) = \alpha + \beta .Education + \epsilon$$
 
 I find statistically significant estimates which indicate that:
 
-1. **a person with a Master’s degree is 7.5 percentage points less likely to have caste preferences than a person with a Bachelor's degree**. 
+1. **A person with a Master’s degree is 7.5 percentage points less likely to have caste preferences than a person with a Bachelor's degree**. 
 
 2. Also, **a person with a Professional degree is  15 percentage points less likely to have caste preferences than a person with a Bachelor’s degree**. 
 
@@ -341,7 +341,7 @@ ggplot(p_2,aes(factor(Degree), y = (Lower_Bound+Upper_Bound)/2, ymin=Lower_Bound
 
 ### Occupation
 
-The occupation variable indicates the sector the person is employed in. It has three main categories: Private Sector, Public Sector and Other (Self-employed, Business or Other). The exploratory analysis in Figure 5 shows that people other or private sectors have a higher than baseline probability of having caste preferences and people working in the public sector have lower than baseline probabilities. 
+The occupation variable indicates the sector the person is employed in. It has three main categories: Private Sector, Public Sector and Other (Self-employed, Business or Other). The exploratory analysis in Figure 5 shows that people working in other or private sectors have a higher than baseline probability of having caste preferences and people working in the public sector have lower than baseline probabilities. 
 <br><br>
 ```{r, echo=FALSE, warning=FALSE, fig.width=10, fig.height=8}
 
@@ -372,7 +372,7 @@ I estimate the following linear probability model in Table 3 in the Appendix:
 
 $$Probability(CastePreferences) = \alpha + \beta .Occupation + \epsilon$$ 
 
-I find statistically significant estimates which indicate that **a person working in the Public Sector is 9 percentage points more likely to have caste preferences than a person working in the Public Sector**. However, this estimate is only significant at the 1% level (p-value=0.06). The estimate for the Other category is not statistically significant.
+I find statistically significant estimates which indicate that **a person working in the Public Sector is 9 percentage points more likely to have caste preferences than a person working in the Private Sector**. However, this estimate is only significant at the 1% level (p-value=0.06). The estimate for the Other category is not statistically significant.
 
 Figure 6 summarizes the regression estimates relative to a person working in the Private Sector. It shows that the confidence interval for people working in the Public Sector has a positive range and only touches zero at the lower bound.
 <br><br>
@@ -406,6 +406,20 @@ ggplot(p_3,aes(factor(Sector), y = (Lower_Bound+Upper_Bound)/2, ymin=Lower_Bound
 
 ###### Figure 6: Regression Estimates of Correlation between Occupation and Caste Preferences. Estimates relative to person working in Private Sector.
 <br><br>
+
+## Conclusion
+
+I find that a person's income, education and occupation are related to a person's attitude towards the caste system. Using regression analysis, I find the following relationships:
+
+* People with higher income are less likely to engage in caste-based mate selection than people with lower income. 
+    + A $1000 increase in annual income is associated with a 0.3 percentage point decline in having caste preferences. Although this is not a very large effect, the effect becomes larger when looking at a higher variation in income.
+
+* When comparing people with Bachelor's degrees, Master's degrees and Professional degrees, people with higher education levels are less likely to engage in caste-based mate selection. 
+    + As compared to people with a Bachelor's degree, people with a Master's degree are 7.5 percentage points less likely and people with a Professional degree are 15 percentage points less likely to have caste preferences. 
+    + I did not obtain a statistically significant estimate for people with Doctorate degrees, but from the exploratory analysis it seems that people with a Doctorate are more likely than the average person to have caste preferences.
+
+* People working in the public sector are more likely to have caste preferences than people who work in the public sector.
+    + A person working in the public sector is 9 percentage points more likely to have caste preferences than a person working in the private sector.
 
 ## Discussion
 
