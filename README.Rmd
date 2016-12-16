@@ -5,6 +5,22 @@ output: github_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(dplyr)
+library(forcats)
+library(stringr)
+library(ggplot2)
+library(forcats)
+library(pander)
+library(knitr)
+library(ggthemes)
+library(gridExtra)
+
+setwd("~/Documents/Fall 2016/Data Sc/Final_Project")
+
+# Load marriage preferences dataset
+preferences_raw <- read_csv("Marriage_Preferences.csv") %>% 
+  tibble::rownames_to_column(var="id")
 ```
 
 ---
@@ -14,23 +30,153 @@ output:
 ---
 
 
-* Name: 
-* Project title:
-* Write-up on RPubs: <http://rpubs.com/rudeboybert/Tree_Growth_Differences>
-* Abstract: Hello World!
+* Name: Trisha Singh
+* Project title: Caste-Based Mate Selection in Modern India
+* Write-up on RPubs: <http://rpubs.com/tsingh/final_project>
+
+**Abstract**: I examine how the prevalence of the caste system in India varies with socio-economic status. Specifically, I answer the question: “When seeking a marriage partner, is the importance given to the partner’s caste related to a person’s income or education?”
+
+I find strong statistically significant relationships between socioeconomic status and attitude towards the caste system. Every $1000 increase in annual income is correlated with a 0.3 percent decrease in probability of having a preference for partner's caste. Additionally, I find that a person with a Master’s degree is 7.5 percentage points less likely and a person with a Professional degree is  15 percentage points less likely to have caste preferences than someone with a Bachelor’s degree. A person working in the public sector is 9 percentage points more likely to give importance to parnter's caste than a person working in the private sector.
 
 
-```{r, echo=FALSE, message=FALSE}
-#
-# Include code for one plot here
-#
-library(ggplot2)
-library(dplyr)
-small <- sample_n(diamonds, 2000) 
-ggplot(data=diamonds, aes(x=carat,y=price,colour=cut)) +
+```{r, echo=FALSE, message=FALSE, fig.width=12, fig.height=8}
+
+preferences <- preferences_raw %>% 
+  
+  # Creating caste and sub caste binary variables
+  mutate(partner_caste = ifelse(Caste == "\n Any Caste \n" |
+                                  grepl("Caste no bar", Caste)==TRUE |
+                                  Caste == "\n None \n" |
+                                  Caste == "n/a", 0, 1)) %>% 
+  mutate(partner_subcaste = ifelse(`Sub Caste` == "\n Any Sub Caste \n" |
+                                     `Sub Caste` == "\n None \n" |
+                                     `Sub Caste` == "n/a", 0, 1)) %>% 
+  
+  # Remove weird case (1 obs)
+  filter(!(partner_caste==0 & partner_subcaste==1)) %>% 
+  
+  # must be hindu for caste/ subcaste to apply
+  filter(Religion=="\n Hindu") %>%  
+  
+  # Cleaning income variable: only keeping income denoted in Rs
+  filter(grepl("Rs", `Annual Income`)==TRUE) %>%
+  mutate(mult_factor = ifelse(grepl("lakh", `Annual Income`)==TRUE, 100000, 
+                              ifelse(grepl("crore", `Annual Income`)== TRUE, 10000000, 1))) %>% 
+  mutate(income = str_sub(`Annual Income`, 8, 1000000)) %>% 
+  mutate(income = str_replace_all(income, " lakhs", "")) %>% 
+  mutate(income = str_replace_all(income, " crores", "")) %>% 
+  mutate(income = str_replace_all(income, ",", "")) %>% 
+  mutate(income = as.numeric(income)*mult_factor) %>% 
+  mutate(income_dollar = income*0.015) %>% 
+  
+  # Cleaning education variable: Bachelor's, Masters, Professional, PhD
+  mutate(education = fct_recode(Education, 
+                                "Bachelor's" = "\n B.A.",
+                                "Professional" = "\n Aeronautical Engineering",
+                                "Professional" = "\n Aviation Degree",
+                                "Bachelor's" = "\n B.A.M.S.",
+                                "Bachelor's" = "\n B.Arch",
+                                "Bachelor's" = "\n B.Com.",
+                                "Bachelor's" = "\n B.Ed.",
+                                "Bachelor's" = "\n B.L.",
+                                "Bachelor's" = "\n B.M.M.",
+                                "Bachelor's" = "\n B.Sc IT/ Computer Science",
+                                "Bachelor's" = "\n B.Sc.",
+                                "Bachelor's" = "\n B.Sc. Nursing",
+                                "Bachelor's" = "\n B.Tech.",
+                                "Bachelor's" = "\n BBA",
+                                "Bachelor's" = "\n BCA",
+                                "Bachelor's" = "\n BDS",
+                                "Bachelor's" = "\n BE",
+                                "Bachelor's" = "\n BFA",
+                                "Bachelor's" = "\n BFM (Financial Management)",
+                                "Bachelor's" = "\n BHM (Hotel Management)",
+                                "Bachelor's" = "\n BHMS",
+                                "Bachelor's" = "\n BPT",
+                                "Bachelor's" = "\n BPharm",
+                                "Bachelor's" = "\n Bachelor Degree in Arts / Science / Commerce",
+                                "Bachelor's" = "\n Bachelor Degree in Engineering / Computers",
+                                "Bachelor's" = "\n Bachelor Degree in Management",
+                                "Professional" = "\n CA",
+                                "Professional" = "\n CFA (Chartered Financial Analyst)",
+                                "Professional" = "\n CS",
+                                "Professional" = "\n ICWA",
+                                "Professional" = "\n LL.B.",
+                                "Professional" = "\n LL.M.",
+                                "Masters" = "\n M.A.",
+                                "Masters" = "\n M.Arch.",
+                                "Masters" = "\n M.Pharm",
+                                "Masters" = "\n M.Phil.",
+                                "Professional" = "\n M.S.(Engg.)",
+                                "Masters" = "\n M.Sc.",
+                                "Masters" = "\n M.Sc. IT / Computer Science",
+                                "Masters" = "\n M.Tech.",
+                                "Masters" = "\n MBA",
+                                "Professional" = "\n MBBS",
+                                "Masters" = "\n MCA",
+                                "Masters" = "\n MCom",
+                                "Masters" = "\n MD / MS (Medical)",
+                                "Masters" = "\n MDS",
+                                "Masters" = "\n ME",
+                                "Masters" = "\n MFM (Financial Management)",
+                                "Masters" = "\n MHM  (Hotel Management)",
+                                "Masters" = "\n MHRM (Human Resource Management)",
+                                "Masters" = "\n MPT",
+                                "Masters" = "\n Master Degree in Arts / Science / Commerce",
+                                "Masters" = "\n Master Degree in Management",
+                                "Masters" = "\n Master Degree in Medicine",
+                                "Masters" = "\n Masters Degree in Engineering / Computers",
+                                "Doctorate" = "\n PGDCA",
+                                "Doctorate" = "\n PGDM",
+                                "Doctorate" = "\n Ph.D."
+                                )) %>% 
+  # cleaning height
+  mutate(height=as.numeric(str_sub(Height, str_length(Height)-5, str_length(Height)-2))) %>% 
+  mutate(partner_height=as.numeric(str_sub(Height_1, str_length(Height_1)-5, str_length(Height_1)-2))) %>% 
+
+# Clean parent contact
+  mutate(parent_contact = ifelse(`Parent Contact`=="\n\t\t\t\t\t\tAvailable\n\t\t\t\t\t\t", 1, 0)) %>% 
+
+# Relevel education
+  mutate(education=fct_relevel(education, "Bachelor's")) %>% 
+
+# Group job and relevel
+  mutate(job = fct_recode(`Employed in`,
+                          "Public Sector" = "\n Government/PSU",
+                          "Private Sector" = "\n Private Sector",
+                          "Other" = "\n Self Employed",
+                          "Other" = "\n Business",
+                          "Other" = "\n Defence")) %>% 
+  mutate(job=fct_relevel(job, "Private Sector")) %>% 
+
+# Clean age
+  mutate(age = as.numeric(str_match_all(Age, "[0-9]+")))
+
+# Baseline partner caste prefs
+
+baseline_caste <- as.numeric(table(preferences$partner_caste)[2]/
+  (table(preferences$partner_caste)[1]+table(preferences$partner_caste)[2]))
+
+## INCOME DECILES ##
+
+# Create income deciles
+preferences$income_deciles <- preferences$income_dollar %>% 
+  cut(.,
+      breaks=quantile(., probs=seq(0,1, by=0.10), na.rm=TRUE), 
+      include.lowest=TRUE) %>% 
+  as.numeric()
+
+preferences %>% 
+  group_by(income_deciles) %>% 
+  summarize(prop_caste=mean(partner_caste)) %>% 
+  ggplot(aes(x=income_deciles, y=prop_caste)) + 
   geom_point() +
-  scale_y_log10() + 
-  facet_wrap(~cut) +
-  ggtitle("Replace this plot with one of your own")
+  geom_smooth(method="lm") +
+  theme(text = element_text(family="Verdana"), 
+             axis.text.x = element_text(angle=45, hjust = 1, face = "bold"), 
+             axis.text.y = element_text(face = "bold"), 
+             plot.title = element_text(size=20)) +
+  labs(title = "Relationship between Income and Caste Preferences",
+         y = "Proportion of people who stated caste prefs", x = "Income Deciles")
 ```
 
